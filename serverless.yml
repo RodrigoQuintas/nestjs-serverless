@@ -1,0 +1,14 @@
+service: nest-serverless-framework-demo
+plugins:
+  - serverless-offline
+provider:
+  name: aws
+  runtime: nodejs12.x
+functions:
+  main:
+    handler: dist/serverless.handler
+    events:
+      - http:
+          method: any
+          path: /
+
