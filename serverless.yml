@@ -1,6 +1,7 @@
 service: nest-serverless-framework-demo
 plugins:
   - serverless-offline
+  - serverless-step-functions
 provider:
   name: aws
   runtime: nodejs12.x
@@ -11,4 +12,9 @@ functions:
       - http:
           method: any
           path: /
-
+  stepFunctions:
+    ${file(src/step-functions/test-step-function/function.yml)}
+stepFunctions:
+  stateMachines:
+    testStepFunction:
+      ${file(src/step-functions/test-step-function/definition.yml)}

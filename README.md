@@ -8,8 +8,8 @@ Just a test project with these tecnologies:
 | Servesless Framework | OK |
 | AWS Lambda | OK |
 | AWS SQS | Working |
-| AWS Step Functions | Working |
-##### My idea is run a nestjs projet inside a lambda function, calling SQS and step function inside this lambda.
+| AWS Step Functions | OK |
+##### My idea is run a nestjs projet inside a lambda function, calling SQS and a step function inside this lambda.
 
 ## Installation
 

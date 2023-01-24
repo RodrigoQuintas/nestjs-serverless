@@ -3,6 +3,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { Express } from 'express';
+import { handlerStepFunctions } from './serverless';
 export async function createApp(
   expressApp: Express,
 ): Promise<INestApplication> {
@@ -12,3 +13,5 @@ export async function createApp(
   );
   return app;
 }
+
+export const stepFunction = handlerStepFunctions;

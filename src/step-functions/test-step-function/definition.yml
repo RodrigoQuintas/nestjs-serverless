@@ -1,0 +1,41 @@
+name: "testStepFunction"
+definition:
+  Comment: Just a step function test
+  StartAt: firstStep
+  States:
+    firstStep:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [stepFunctions, Arn]
+      OutputPath: "$"
+      Parameters:
+        Payload:
+          name: firstStep
+          payload.$: "$"
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+          IntervalSeconds: 2
+          MaxAttempts: 6
+          BackoffRate: 2
+      Next: secondStep
+    secondStep:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [stepFunctions, Arn]
+      OutputPath: "$"
+      Parameters:
+        Payload:
+          name: secondStep
+          payload.$: "$"
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+          IntervalSeconds: 2
+          MaxAttempts: 6
+          BackoffRate: 2
+      End: true
