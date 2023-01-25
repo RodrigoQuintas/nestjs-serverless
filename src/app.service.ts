@@ -9,4 +9,8 @@ export class AppService {
   getHelloPost(): string {
     return 'Hello World POST!';
   }
+
+  getTeste(): string {
+    return 'Hello World Teste!';
+  }
 }

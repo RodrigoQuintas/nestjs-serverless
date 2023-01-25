@@ -12,6 +12,9 @@ functions:
       - http:
           method: any
           path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'
   stepFunctions:
     ${file(src/step-functions/test-step-function/function.yml)}
 stepFunctions:
