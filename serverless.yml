@@ -1,10 +1,11 @@
 service: nest-serverless-framework-demo
+useDotenv: true
 plugins:
   - serverless-offline
   - serverless-step-functions
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs18.x
 functions:
   main:
     handler: dist/serverless.handler
@@ -14,10 +15,15 @@ functions:
           path: /
       - http:
           method: ANY
-          path: '{proxy+}'
-  stepFunctions:
-    ${file(src/step-functions/test-step-function/function.yml)}
+          path: "{proxy+}"
+  stepFunctions: ${file(src/step-functions/test-step-function/function.yml)}
+  microservices:
+    handler: dist/serverless.handlerRabbitMQ
+    events:
+      - rabbitmq:
+          arn: arn:aws:mq:us-east-1:250792175375:broker:test-rabbitmq-broker:b-26da2c7a-cc84-4bf1-818e-81d54faa713b
+          queue: just_test_queue
+          basicAuthArn: arn:aws:secretsmanager:us-east-1:250792175375:secret:MQAccess-7jQ2ml
 stepFunctions:
   stateMachines:
-    testStepFunction:
-      ${file(src/step-functions/test-step-function/definition.yml)}
+    testStepFunction: ${file(src/step-functions/test-step-function/definition.yml)}

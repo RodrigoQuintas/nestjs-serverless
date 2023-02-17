@@ -20,9 +20,14 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.259.0",
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/microservices": "^9.2.1",
     "@nestjs/platform-express": "^9.0.0",
+    "amqp-connection-manager": "^4.1.10",
+    "amqplib": "^0.10.3",
     "aws-lambda": "^1.0.7",
     "aws-serverless-express": "^3.4.0",
     "reflect-metadata": "^0.1.13",
