@@ -1,58 +1,64 @@
 
-## Description
+## Descrição
 
-Just a test project with these tecnologies:
-| Tecnology | Progress |
-|---|---|
-| Nestjs | OK |
-| Servesless Framework | OK |
-| AWS Lambda | OK |
-| AWS SQS | Working |
-| AWS Step Functions | OK |
-##### My idea is run a nestjs projet inside a lambda function, calling SQS and a step function inside this lambda.
+Projeto NestJs com arquitetura de eventos.
 
-## Installation
+## Serverless
 
-```bash
-$ npm install
-```
+Utilizei o serverless framework para subir minhas lambdas. Dentro do arquivo `serverless.yml` tem toda configuração. Basicamente estou subindo três lambdas:
+- main: 
 
-## Running the app
+Responsável pelas requisições http da aplicação.
+- stepFunctions: 
 
-```bash
-# development
-$ npm run start
+Responsável pela stepfunctions.
+- microserves: 
 
-# watch mode
-$ npm run start:dev
+Responsável por consumir as mensagens do RabbitMQ.
 
-# production mode
-$ npm run start:prod
-```
+Nesse projeto crio três filas sendo duas delas (`sales` e `transports`) para eventos e uma (`informations`) para request response.
 
-## Test
+## Endpoints
+Criei dois endpoints para conseguir testar o fluxo completo da arquitetura de eventos. 
 
-```bash
-# unit tests
-$ npm run test
+### GET - Busca as informações de uma venda
+Localmente:  
 
-# e2e tests
-$ npm run test:e2e
+Se conecta com o RabbitMQ, insere uma mensagem na fila `informations` e espera o retorno.
 
-# test coverage
-$ npm run test:cov
-```
+Lambda:
 
-## Support
+Se conecta com a lambda `microservices` passando os padrões da mensagem e aguarda o retorno.
+### POST - Inicia o fluxo de uma venda
+A lambda http (`main`) insere na fila de `sales` que starta a lambda de `microservices`, que consome o rabbitmq e insere na fila de `transports`.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Testando o projeto localmente
+``
+    npm run build && sls offline
+``
 
-## Stay in touch
+## Subindo no AWS
+Após configurar as credenciais do AWS, basta rodar:
+``
+    npm run build && sls deploy
+``
+Três lambdas serão criadas em seu ambiente. 
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Configurando o .env
+Necessário criar um arquivo .env dentro da pasta raiz, pode usar o .env-example como arquivo de exemplo.
 
-## License
+    STAGE - dev ou prod
 
-Nest is [MIT licensed](LICENSE).
+    RABBIT_URL - url do seu rabbitMQ. Ex: amqp://guest:guest@localhost:5672
+
+    RABBIT_BROKER_ARN - ARN do broker do rabbitMQ
+
+    RABBIT_BASIC_AUTH_ARN - ARN do AWS Secrets Manager com as credenciais do broker
+
+    MICROSERVICE_LAMBDA - nome da lambda de microservices Ex: nest-serverless-framework-demo-dev-microservices
+
+    ACCESS_KEY_AWS - access key AWS
+
+    SECRET_ACCESS_KEY_AWS - secret access key AWS
+
+    REGION_AWS - regiao AWS

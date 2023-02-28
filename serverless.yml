@@ -3,8 +3,22 @@ useDotenv: true
 plugins:
   - serverless-offline
   - serverless-step-functions
+  - serverless-dotenv-plugin
 provider:
   name: aws
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ec2:DescribeNetworkInterfaces
+            - ec2:CreateNetworkInterface
+            - ec2:DeleteNetworkInterface
+            - ec2:DescribeInstances
+            - ec2:AttachNetworkInterface
+            - ec2:AssignPrivateIpAddresses
+            - ec2:UnassignPrivateIpAddresses
+          Resource: "*"
   runtime: nodejs18.x
 functions:
   main:
@@ -16,14 +30,23 @@ functions:
       - http:
           method: ANY
           path: "{proxy+}"
-  stepFunctions: ${file(src/step-functions/test-step-function/function.yml)}
+  stepFunctions: 
+    handler: dist/serverless.handlerStepFunctions
   microservices:
-    handler: dist/serverless.handlerRabbitMQ
+    handler: dist/microservices.handler
     events:
       - rabbitmq:
-          arn: arn:aws:mq:us-east-1:250792175375:broker:test-rabbitmq-broker:b-26da2c7a-cc84-4bf1-818e-81d54faa713b
-          queue: just_test_queue
-          basicAuthArn: arn:aws:secretsmanager:us-east-1:250792175375:secret:MQAccess-7jQ2ml
+          arn: ${env:RABBIT_BROKER_ARN}
+          queue: sales
+          basicAuthArn: ${env:RABBIT_BASIC_AUTH_ARN}
+      - rabbitmq:
+          arn: ${env:RABBIT_BROKER_ARN}
+          queue: informations
+          basicAuthArn: ${env:RABBIT_BASIC_AUTH_ARN}
+      - rabbitmq:
+          arn: ${env:RABBIT_BROKER_ARN}
+          queue: transports
+          basicAuthArn: ${env:RABBIT_BASIC_AUTH_ARN}
 stepFunctions:
   stateMachines:
     testStepFunction: ${file(src/step-functions/test-step-function/definition.yml)}

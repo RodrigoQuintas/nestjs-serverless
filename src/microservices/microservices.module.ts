@@ -1,7 +1,11 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ClientLambdaEvent } from './client/client-lambda-event';
-import { ClientLambdaMessage } from './client/client-lambda-message';
+import { ClientLambdaRequestResponse } from './client/client-lambda-request-response';
+
+/**
+ * Module used to link nest with transporters
+ */
 
 @Module({
   imports: [],
@@ -10,6 +14,7 @@ import { ClientLambdaMessage } from './client/client-lambda-message';
 })
 export class MicroservicesModule {
   public static forRequestResponse(clientName: string): DynamicModule {
+    //When dev stage, for request response not used the published lambda
     if (process.env.STAGE === 'dev')
       return ClientsModule.register([
         {
@@ -17,7 +22,7 @@ export class MicroservicesModule {
           transport: Transport.RMQ,
           options: {
             urls: [process.env.RABBIT_URL],
-            queue: 'just_test_queue',
+            queue: clientName,
             queueOptions: {
               durable: true,
             },
@@ -28,9 +33,9 @@ export class MicroservicesModule {
     return ClientsModule.register([
       {
         name: clientName,
-        customClass: ClientLambdaMessage,
+        customClass: ClientLambdaRequestResponse,
         options: {
-          functionName: `nest-serverless-framework-demo-dev-microservices`,
+          functionName: process.env.MICROSERVICE_LAMBDA,
         },
       },
     ]);
@@ -40,13 +45,9 @@ export class MicroservicesModule {
     return ClientsModule.register([
       {
         name: clientName,
-        transport: Transport.RMQ,
+        customClass: ClientLambdaEvent,
         options: {
-          urls: [process.env.RABBIT_URL],
-          queue: 'just_test_queue',
-          queueOptions: {
-            durable: true,
-          },
+          queue: clientName,
         },
       },
     ]);

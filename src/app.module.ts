@@ -8,10 +8,12 @@ import { StepFunctionsModule } from './step-functions/step-function.module';
   imports: [
     StepFunctionsModule,
     ConfigModule.forRoot(),
-    MicroservicesModule.forRequestResponse('TEST_QUEUE'),
-    MicroservicesModule.forEventDriven('TEST_QUEUE_EVENT'),
+    MicroservicesModule.forEventDriven('sales'),
+    MicroservicesModule.forRequestResponse('informations'),
+    MicroservicesModule.forEventDriven('transports'),
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [],
 })
 export class AppModule {}
